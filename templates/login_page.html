@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - EquiTerra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        display: flex;
+        min-height: calc(100vh - 180px);
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 5%;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 450px;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-header {
+        padding: 2.5rem 2.5rem 1.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.05));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .login-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: 'Montserrat', sans-serif;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-logo i {
+        color: var(--primary-color);
+    }
+
+    .login-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .login-body {
+        padding: 2rem 2.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: var(--text-light);
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius);
+        color: var(--text-light);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1.1rem;
+        height: 1.1rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.25rem;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23fff'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+        background-size: 70%;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .form-check-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password:hover {
+        color: var(--primary-light);
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .login-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .login-divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .login-divider::before {
+        margin-right: 1rem;
+    }
+
+    .login-divider::after {
+        margin-left: 1rem;
+    }
+
+    .wallet-login-button {
+        width: 100%;
+        padding: 1rem;
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .wallet-login-button:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .login-footer a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .login-footer a:hover {
+        color: var(--primary-light);
+    }
+
+    .error-message {
+        padding: 1rem;
+        background-color: rgba(239, 68, 68, 0.15);
+        color: var(--error-color);
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .error-message i {
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 1rem;
+        }
+
+        .login-header {
+            padding: 2rem 1.5rem 1rem;
+        }
+
+        .login-body {
+            padding: 1.5rem;
+        }
+
+        .form-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .forgot-password {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-building-circle-check"></i>
+                EquiTerra
+            </div>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to manage your real estate portfolio</p>
+        </div>
+
+        <div class="login-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form id="loginForm" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           class="form-control" 
+                           placeholder="Enter your email" 
+                           required
+                           value="{{ form.email.value|default_if_none:'' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-control" 
+                           placeholder="Enter your password" 
+                           required>
+                </div>
+                
+                <div class="form-footer">
+                    <div class="form-check">
+                        <input type="checkbox" id="remember" name="remember" class="form-check-input">
+                        <label for="remember" class="form-check-label">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">
+                        Forgot password?
+                    </a>
+                </div>
+                
+                <button type="submit" class="login-button">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+
+            <div class="login-divider">or continue with</div>
+
+            <button class="wallet-login-button" onclick="connectWallet()">
+                <i class="fas fa-wallet"></i> Connect Wallet
+            </button>
+
+            <div class="login-footer">
+                Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    async function connectWallet() {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+                
+                // Sign message for authentication
+                const message = "Login to OpulRent";
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, account],
+                });
+
+                // Send to backend for verification
+                const response = await fetch('/api/auth/wallet-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        address: account,
+                        signature: signature,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token and redirect
+                    localStorage.setItem('jwt', data.token);
+                    window.location.href = "{% url 'dashboard' %}";
+                } else {
+                    showMessage('Wallet login failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error connecting wallet: ' + error.message, 'error');
+            }
+        } else {
+            showMessage('Please install MetaMask to use wallet login', 'error');
+        }
+    }
+
+    function showMessage(text, type) {
+        const messagesDiv = document.querySelector('.login-body');
+        const message = document.createElement('div');
+        message.className = `error-message ${type}`;
+        
+        let icon;
+        if (type === 'error') {
+            icon = '<i class="fas fa-exclamation-circle"></i>';
+        } else {
+            icon = '<i class="fas fa-info-circle"></i>';
+        }
+        
+        message.innerHTML = `${icon} ${text}`;
+        messagesDiv.insertBefore(message, messagesDiv.firstChild);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            message.remove();
+        }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize form validation
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    e.preventDefault();
+                    showMessage('Please fill in all required fields', 'error');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

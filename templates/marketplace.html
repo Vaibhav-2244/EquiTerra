@@ -1,0 +1,608 @@
+{% extends "base.html" %}
+
+{% block title %}Real Estate Marketplace | EquiTerra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .marketplace-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 5%;
+    }
+
+    .marketplace-header {
+        margin-bottom: 3rem;
+    }
+
+    .marketplace-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .marketplace-description {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 700px;
+        line-height: 1.6;
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 2.5rem;
+        max-width: 800px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1.25rem 1.5rem 1.25rem 3.5rem;
+        border-radius: var(--border-radius);
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .property-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .property-tab {
+        padding: 0.75rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-secondary);
+    }
+
+    .property-tab:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+    }
+
+    .property-tab.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .property-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .property-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: var(--box-shadow);
+    }
+
+    .property-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .property-image-container {
+        height: 240px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .property-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .property-card:hover .property-image {
+        transform: scale(1.05);
+    }
+
+    .property-badge {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        padding: 0.5rem 1.25rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        z-index: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge-sale {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .badge-rent {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        color: white;
+    }
+
+    .property-details {
+        padding: 1.75rem;
+    }
+
+    .property-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .property-location {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .property-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .property-features {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .feature-icon {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+    }
+
+    .feature-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .fractional-section {
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .fractional-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .units-available {
+        color: var(--text-secondary);
+    }
+
+    .unit-price {
+        color: var(--success-color);
+        font-weight: 600;
+    }
+
+    .fractional-form {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .units-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        background-color: var(--card-bg);
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .buy-button {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .buy-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: var(--border-radius);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-message {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .carousel-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    .carousel-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .carousel-slide.active {
+        opacity: 1;
+    }
+
+    .carousel-controls {
+        position: absolute;
+        bottom: 1rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        z-index: 2;
+    }
+
+    .carousel-dot {
+        width: 10px;
+        height: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-dot.active {
+        background-color: white;
+        transform: scale(1.2);
+    }
+
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1rem;
+        z-index: 2;
+    }
+
+    .carousel-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-button:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+        transform: scale(1.1);
+    }
+
+    @media (max-width: 1024px) {
+        .property-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .marketplace-title {
+            font-size: 2rem;
+        }
+        
+        .property-tabs {
+            gap: 0.75rem;
+        }
+        
+        .property-tab {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .search-input {
+            padding-left: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="marketplace-container">
+    <div class="marketplace-header">
+        <h1 class="marketplace-title">Real Estate Marketplace</h1>
+        <p class="marketplace-description">
+            Discover tokenized properties available for investment, purchase, or rental. Own a fraction or the entire asset with blockchain-powered transactions.
+        </p>
+    </div>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'marketplace' %}" class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+            type="text" 
+            name="search"
+            class="search-input"
+            placeholder="Search by location, property type, or price..." 
+            value="{{ request.GET.search }}"
+        />
+    </form>
+
+    <!-- Property Tabs -->
+    <div class="property-tabs">
+        <a href="{% url 'marketplace' %}" class="property-tab active">All Properties</a>
+        <a href="{% url 'buy_properties' %}" class="property-tab">Buy</a>
+        <a href="{% url 'rent_properties' %}" class="property-tab">Rent</a>
+    </div>
+
+    <!-- Property Cards Grid -->
+    <div class="property-grid">
+        {% for property in properties %}
+        <div class="property-card">
+            <a href="{% if property.sale_price %}{% url 'property_detail' property.id 'sale' %}{% else %}{% url 'property_detail' property.id 'rent' %}{% endif %}" style="text-decoration: none; color: inherit;">
+                <div class="property-image-container">
+                    <div class="carousel-container" id="carousel-{{ property.id }}">
+                        {% if property.image1 %}
+                        <div class="carousel-slide active">
+                            <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                        </div>
+                        {% endif %}
+                        {% if property.image2 %}
+                        <div class="carousel-slide">
+                            <img src="{{ property.image2.url }}" alt="{{ property.house_type }}" class="property-image">
+                        </div>
+                        {% endif %}
+                        {% if property.image3 %}
+                        <div class="carousel-slide">
+                            <img src="{{ property.image3.url }}" alt="{{ property.house_type }}" class="property-image">
+                        </div>
+                        {% endif %}
+                        
+                        {% if not property.image1 %}
+                        <div class="carousel-slide active" style="display: flex; align-items: center; justify-content: center; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="carousel-nav">
+                        <button class="carousel-button" onclick="prevSlide(event, 'carousel-{{ property.id }}')">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-button" onclick="nextSlide(event, 'carousel-{{ property.id }}')">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="carousel-controls">
+                        {% if property.image1 %}
+                        <div class="carousel-dot active" onclick="goToSlide(event, 'carousel-{{ property.id }}', 0)"></div>
+                        {% endif %}
+                        {% if property.image2 %}
+                        <div class="carousel-dot" onclick="goToSlide(event, 'carousel-{{ property.id }}', 1)"></div>
+                        {% endif %}
+                        {% if property.image3 %}
+                        <div class="carousel-dot" onclick="goToSlide(event, 'carousel-{{ property.id }}', 2)"></div>
+                        {% endif %}
+                    </div>
+                    
+                    <span class="property-badge {% if property.sale_price %}badge-sale{% else %}badge-rent{% endif %}">
+                        {% if property.sale_price %}For Sale{% else %}For Rent{% endif %}
+                    </span>
+                </div>
+                
+                <div class="property-details">
+                    <h3 class="property-title">{{ property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.locality }}, {{ property.city }}
+                    </p>
+                    <p class="property-price">
+                        {% if property.sale_price %}
+                            {{ property.sale_price }} ETH
+                        {% else %}
+                            {{ property.rent }} ETH/month
+                        {% endif %}
+                    </p>
+                    
+                    <div class="property-features">
+                        <div class="feature">
+                            <i class="fas fa-bed feature-icon"></i>
+                            <span class="feature-label">{{ property.beds }} Beds</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bath feature-icon"></i>
+                            <span class="feature-label">{{ property.bathrooms }} Baths</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-ruler-combined feature-icon"></i>
+                            <span class="feature-label">{{ property.area }} sqft</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            
+            {% if property.sale_price and property.units_available > 0 %}
+            <div class="fractional-section">
+                <div class="fractional-header">
+                    <span class="units-available">{{ property.units_available }} units available</span>
+                    <span class="unit-price">{{ property.unit_price|floatformat:4 }} ETH/unit</span>
+                </div>
+                <form action="{% url 'property_detail' property.id 'sale' %}" method="get" class="fractional-form">
+                    <input type="number" 
+                           name="units" 
+                           class="units-input" 
+                           min="1" 
+                           max="{{ property.units_available }}" 
+                           value="1"
+                           placeholder="Units to buy">
+                    <button type="submit" class="buy-button">
+                        <i class="fas fa-shopping-cart"></i> Buy Now
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-search-dollar empty-icon"></i>
+            <h3>No Properties Available</h3>
+            <p class="empty-message">
+                Currently there are no properties matching your search. Try adjusting your filters or check back later.
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript for carousel functionality -->
+<script>
+    // Initialize carousels on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up all carousels
+        document.querySelectorAll('.carousel-container').forEach(carousel => {
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            if (slides.length > 1) {
+                // Start auto-rotation if more than one slide
+                setInterval(() => {
+                    nextAutoSlide(carousel.id);
+                }, 5000);
+            }
+        });
+    });
+
+    function nextAutoSlide(carouselId) {
+        const carousel = document.getElementById(carouselId);
+        if (!carousel) return;
+        
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.parentElement.querySelectorAll('.carousel-dot');
+        
+        let activeIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+        slides[activeIndex].classList.remove('active');
+        dots[activeIndex].classList.remove('active');
+        
+        activeIndex = (activeIndex + 1) % slides.length;
+        slides[activeIndex].classList.add('active');
+        dots[activeIndex].classList.add('active');
+    }
+
+    function nextSlide(event, carouselId) {
+        event.preventDefault();
+        event.stopPropagation();
+        nextAutoSlide(carouselId);
+    }
+    
+    function prevSlide(event, carouselId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const carousel = document.getElementById(carouselId);
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.parentElement.querySelectorAll('.carousel-dot');
+        
+        let activeIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+        slides[activeIndex].classList.remove('active');
+        dots[activeIndex].classList.remove('active');
+        
+        activeIndex = (activeIndex - 1 + slides.length) % slides.length;
+        slides[activeIndex].classList.add('active');
+        dots[activeIndex].classList.add('active');
+    }
+
+    function goToSlide(event, carouselId, index) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const carousel = document.getElementById(carouselId);
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const dots = carousel.parentElement.querySelectorAll('.carousel-dot');
+        
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+    }
+</script>
+{% endblock %}

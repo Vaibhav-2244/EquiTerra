@@ -1,0 +1,655 @@
+{% extends "base.html" %}
+
+{% block title %}{{ property.house_type }} | EquiTerra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .property-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 5%;
+    }
+    
+    .property-header {
+        margin-bottom: 2rem;
+    }
+    
+    .property-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .property-location {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .property-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 2rem;
+    }
+    
+    .property-image-carousel {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        background-color: var(--section-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .carousel-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+    
+    .carousel-slide.active {
+        opacity: 1;
+    }
+    
+    .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 1rem;
+        z-index: 2;
+    }
+    
+    .carousel-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .carousel-button:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+        transform: scale(1.1);
+    }
+    
+    .carousel-controls {
+        position: absolute;
+        bottom: 1rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        z-index: 2;
+    }
+    
+    .carousel-dot {
+        width: 10px;
+        height: 10px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .carousel-dot.active {
+        background-color: white;
+        transform: scale(1.2);
+    }
+    
+    .property-details-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--box-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .property-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+    
+    .property-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .meta-icon {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        width: 24px;
+        text-align: center;
+    }
+    
+    .meta-label {
+        font-size: 0.95rem;
+        color: var(--text-light);
+    }
+    
+    .meta-value {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .property-owner {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .owner-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .owner-name {
+        font-size: 0.95rem;
+        color: var(--text-light);
+    }
+    
+    .owner-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-buy {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .btn-buy:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+    
+    .fractional-section {
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .fractional-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--text-light);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .fractional-form {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+    
+    .units-input {
+        width: 100%;
+        padding: 0.85rem 1.25rem;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-light);
+        font-size: 0.95rem;
+    }
+    
+    .price-display {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    
+    .price-item {
+        font-size: 0.9rem;
+    }
+    
+    .price-label {
+        color: var(--text-secondary);
+    }
+    
+    .price-value {
+        color: var(--text-light);
+        font-weight: 500;
+    }
+    
+    .empty-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-secondary);
+        font-size: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .property-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .property-image-carousel {
+            height: 400px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .property-title {
+            font-size: 1.75rem;
+        }
+        
+        .property-meta {
+            grid-template-columns: 1fr;
+        }
+        
+        .property-image-carousel {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="property-container">
+    <div class="property-header">
+        <h1 class="property-title">{{ property.house_type }}</h1>
+        <p class="property-location">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ property.locality }}, {{ property.city }}
+        </p>
+    </div>
+    
+    <div class="property-grid">
+        <!-- Image Carousel -->
+        <div class="property-image-carousel" id="property-carousel">
+            {% if property.image1 %}
+            <div class="carousel-slide active">
+                <img src="{{ property.image1.url }}" alt="{{ property.house_type }} - Image 1">
+            </div>
+            {% endif %}
+            {% if property.image2 %}
+            <div class="carousel-slide">
+                <img src="{{ property.image2.url }}" alt="{{ property.house_type }} - Image 2">
+            </div>
+            {% endif %}
+            {% if property.image3 %}
+            <div class="carousel-slide">
+                <img src="{{ property.image3.url }}" alt="{{ property.house_type }} - Image 3">
+            </div>
+            {% endif %}
+            {% if property.image4 %}
+            <div class="carousel-slide">
+                <img src="{{ property.image4.url }}" alt="{{ property.house_type }} - Image 4">
+            </div>
+            {% endif %}
+            {% if property.image5 %}
+            <div class="carousel-slide">
+                <img src="{{ property.image5.url }}" alt="{{ property.house_type }} - Image 5">
+            </div>
+            {% endif %}
+            {% if not property.image1 %}
+            <div class="carousel-slide active">
+                <div class="empty-image">
+                    <i class="fas fa-home"></i>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if property.image1 %}
+            <div class="carousel-nav">
+                <button class="carousel-button" onclick="prevSlide('property-carousel')">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-button" onclick="nextSlide('property-carousel')">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="carousel-controls">
+                {% if property.image1 %}<div class="carousel-dot active" onclick="goToSlide('property-carousel', 0)"></div>{% endif %}
+                {% if property.image2 %}<div class="carousel-dot" onclick="goToSlide('property-carousel', 1)"></div>{% endif %}
+                {% if property.image3 %}<div class="carousel-dot" onclick="goToSlide('property-carousel', 2)"></div>{% endif %}
+                {% if property.image4 %}<div class="carousel-dot" onclick="goToSlide('property-carousel', 3)"></div>{% endif %}
+                {% if property.image5 %}<div class="carousel-dot" onclick="goToSlide('property-carousel', 4)"></div>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Property Details -->
+        <div class="property-details-card">
+            <div class="property-price">
+                {% if property_type == 'sale' %}
+                    {{ property.sale_price }} ETH
+                {% else %}
+                    {{ property.rent }} ETH/month
+                {% endif %}
+            </div>
+            
+            <div class="property-meta">
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Bedrooms</div>
+                        <div class="meta-value">{{ property.beds }}</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-bath"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Bathrooms</div>
+                        <div class="meta-value">{{ property.bathrooms }}</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-ruler-combined"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Area</div>
+                        <div class="meta-value">{{ property.area }} sqft</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-couch"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Furnishing</div>
+                        <div class="meta-value">{{ property.furnishing }}</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Balconies</div>
+                        <div class="meta-value">{{ property.balconies }}</div>
+                    </div>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div>
+                        <div class="meta-label">Area Rate</div>
+                        <div class="meta-value">{{ property.area_rate }} ETH/sqft</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="property-owner">
+                <div class="owner-avatar">
+                    {{ property.owner.username|first|upper }}
+                </div>
+                <div>
+                    <div class="owner-name">{{ property.owner.username }}</div>
+                    <div class="owner-label">Property Owner</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                {% if user.is_authenticated %}
+                    <button onclick="buyWithMetaMask({{ property.id }}, {{ property.sale_price }})" class="btn-buy">
+                        <i class="fas fa-shopping-cart"></i> Buy Now with MetaMask
+                    </button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-buy">
+                        <i class="fas fa-sign-in-alt"></i> Login to {% if property_type == 'sale' %}Buy{% else %}Rent{% endif %}
+                    </a>
+                {% endif %}
+            </div>
+            
+            {% if property_type == 'sale' %}
+            <div class="fractional-section">
+                <h3 class="fractional-title">
+                    <i class="fas fa-boxes"></i> Fractional Purchase
+                </h3>
+                
+                <form action="{% url 'property_action' property.id 'sale' %}" method="post" class="fractional-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="units" class="form-label">Units to buy (max {{ units_available }})</label>
+                        <input type="number" id="units" name="units" min="1" max="{{ units_available }}" 
+                               value="1" oninput="updateTotalPrice()" class="units-input">
+                    </div>
+                    
+                    <div class="price-display">
+                        <div class="price-item">
+                            <span class="price-label">Unit price:</span>
+                            <span class="price-value" id="unitPrice">{{ unit_price|floatformat:4 }} ETH</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="price-label">Total price:</span>
+                            <span class="price-value" id="totalPrice">{{ unit_price|floatformat:4 }} ETH</span>
+                        </div>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                        <button onclick="buyUnitsWithMetaMask({{ property.id }}, {{ property.unit_price }})" class="btn-buy">
+                            <i class="fas fa-boxes"></i> Buy Units
+                        </button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn-buy">
+                            <i class="fas fa-sign-in-alt"></i> Login to Buy Units
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function nextSlide(carouselId) {
+    const carousel = document.getElementById(carouselId);
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const dots = carousel.querySelectorAll('.carousel-dot');
+
+    let activeIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+    slides[activeIndex].classList.remove('active');
+    dots[activeIndex].classList.remove('active');
+
+    activeIndex = (activeIndex + 1) % slides.length;
+    slides[activeIndex].classList.add('active');
+    dots[activeIndex].classList.add('active');
+}
+
+function prevSlide(carouselId) {
+    const carousel = document.getElementById(carouselId);
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const dots = carousel.querySelectorAll('.carousel-dot');
+
+    let activeIndex = Array.from(slides).findIndex(slide => slide.classList.contains('active'));
+    slides[activeIndex].classList.remove('active');
+    dots[activeIndex].classList.remove('active');
+
+    activeIndex = (activeIndex - 1 + slides.length) % slides.length;
+    slides[activeIndex].classList.add('active');
+    dots[activeIndex].classList.add('active');
+}
+
+function goToSlide(carouselId, index) {
+    const carousel = document.getElementById(carouselId);
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const dots = carousel.querySelectorAll('.carousel-dot');
+
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+}
+
+function updateTotalPrice() {
+    var units = document.getElementById('units').value;
+    var unitPrice = parseFloat(document.getElementById('unitPrice').textContent);
+    var totalPrice = (units * unitPrice).toFixed(4);
+    document.getElementById('totalPrice').textContent = totalPrice;
+}
+</script>
+
+<!-- Keep all the existing contract and MetaMask scripts -->
+<script>
+    const contractAddress = "0xb0d85c86e60e258D4850de6109Fb12cfBA9FaA1E";
+    const contractABI = [
+        // ... (keep your existing ABI here)
+    ];
+    
+    let web3;
+    let contract;
+    
+    window.addEventListener('load', async () => {
+        if (window.ethereum) {
+            web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+        } else {
+            alert("Please install MetaMask to use this feature!");
+        }
+    });
+    
+    async function buyWithMetaMask(propertyId, priceInEth) {
+        const accounts = await web3.eth.getAccounts();
+        const account = accounts[0];
+    
+        try {
+            const priceWei = web3.utils.toWei(priceInEth.toString(), 'ether');
+            await contract.methods.buyProperty(propertyId).send({
+                from: account,
+                value: priceWei
+            });
+            alert("Transaction successful!");
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert("Transaction failed!");
+        }
+    }
+    
+    async function buyUnitsWithMetaMask(propertyId, unitPriceInEth) {
+        const unitsToBuy = parseInt(document.getElementById('units').value);
+    
+        if (isNaN(unitsToBuy) || unitsToBuy <= 0) {
+            alert("Please enter a valid number of units to buy.");
+            return;
+        }
+    
+        if (typeof window.ethereum === 'undefined') {
+            alert("MetaMask is not installed. Please install MetaMask and try again.");
+            return;
+        }
+    
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const userAddress = accounts[0];
+            const web3 = new Web3(window.ethereum);
+    
+            const totalPriceInEth = unitPriceInEth * unitsToBuy;
+            const priceInWei = web3.utils.toWei(totalPriceInEth.toString(), 'ether');
+    
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+    
+            await contract.methods.buyUnits(propertyId, unitsToBuy).send({
+                from: userAddress,
+                value: priceInWei,
+            });
+    
+            alert("Units purchased successfully!");
+            location.reload();
+    
+        } catch (error) {
+            console.error("Unit purchase failed:", error);
+            alert("Transaction failed. Check console for details.");
+        }
+    }
+</script>
+{% endblock %}

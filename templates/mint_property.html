@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+
+{% block title %}Mint Property NFT - EquiTerra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .content-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 5%;
+    }
+    
+    .page-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+    }
+    
+    .card-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .mint-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--box-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        font-size: 0.9rem;
+        color: var(--primary-color);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.85rem 1.25rem;
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-light);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .btn-mint {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .btn-mint:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-mint:active {
+        transform: translateY(0);
+    }
+    
+    .image-upload-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .image-upload-box {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1/1;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        border-radius: var(--border-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .image-upload-box:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .image-upload-box input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+    
+    .image-upload-box .icon {
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .image-upload-box .label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+    
+    .image-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+    }
+    
+    .image-remove {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem;
+        cursor: pointer;
+        z-index: 3;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .image-upload-box:hover .image-remove {
+        opacity: 1;
+    }
+    
+    .helper-text {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        line-height: 1.5;
+    }
+    
+    .form-spinner {
+        position: relative;
+    }
+    
+    .spinner-buttons {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .spinner-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 50%;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .spinner-button:hover {
+        color: var(--text-light);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .form-control-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+
+    @media (max-width: 1024px) {
+        .image-upload-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .image-upload-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <h1 class="page-title">
+        <i class="fas fa-plus-circle"></i> Mint Property NFT
+    </h1>
+    <p class="card-subtitle">
+        Tokenize your property on the blockchain to enable fractional ownership and seamless transactions.
+        Fill out the form below to create your property NFT.
+    </p>
+
+    <div class="mint-card">
+        <form id="mintPropertyForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="house_type" class="form-label">
+                        <i class="fas fa-home"></i> Property Type *
+                    </label>
+                    <input type="text" id="house_type" name="house_type" class="form-control" required placeholder="e.g. Apartment, Villa, Commercial">
+                </div>
+                
+                <div class="form-group">
+                    <label for="locality" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> Locality *
+                    </label>
+                    <input type="text" id="locality" name="locality" class="form-control" required placeholder="e.g. Bandra West, HSR Layout">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city" class="form-label">
+                        <i class="fas fa-city"></i> City *
+                    </label>
+                    <input type="text" id="city" name="city" class="form-control" required placeholder="e.g. Mumbai, Bangalore">
+                </div>
+                
+                <div class="form-group">
+                    <label for="area" class="form-label">
+                        <i class="fas fa-ruler-combined"></i> Area (sq ft) *
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="area" name="area" class="form-control" min="0" step="1" required placeholder="e.g. 1200">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('area')">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('area')">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="listing_type" class="form-label">
+                    <i class="fas fa-tag"></i> Listing Type *
+                </label>
+                <select id="listing_type" name="listing_type" class="form-control form-control-select" required>
+                    <option value="">-- Select Listing Type --</option>
+                    <option value="sale">For Sale</option>
+                    <option value="rent">For Rent</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group sale-field">
+                    <label for="sale_price" class="form-label">
+                        <i class="fas fa-tag"></i> Sale Price (ETH) *
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="sale_price" name="sale_price" class="form-control" min="0" step="0.01" placeholder="e.g. 5.25">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('sale_price', 0.1)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('sale_price', 0.1)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="helper-text">Total price for the entire property</p>
+                </div>
+                
+                <div class="form-group rent-field" style="display: none;">
+                    <label for="rent" class="form-label">
+                        <i class="fas fa-calendar-alt"></i> Rent (ETH/month) *
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="rent" name="rent" class="form-control" min="0" step="0.01" placeholder="e.g. 0.5">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('rent', 0.1)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('rent', 0.1)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="helper-text">Monthly rental price</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="beds" class="form-label">
+                        <i class="fas fa-bed"></i> Bedrooms *
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="beds" name="beds" class="form-control" min="0" step="1" required placeholder="e.g. 2">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('beds')">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('beds')">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bathrooms" class="form-label">
+                        <i class="fas fa-bath"></i> Bathrooms *
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="bathrooms" name="bathrooms" class="form-control" min="0" step="0.5" required placeholder="e.g. 2.5">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('bathrooms', 0.5)">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('bathrooms', 0.5)">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="balconies" class="form-label">
+                        <i class="fas fa-umbrella-beach"></i> Balconies
+                    </label>
+                    <div class="form-spinner">
+                        <input type="number" id="balconies" name="balconies" class="form-control" min="0" step="1" placeholder="e.g. 2">
+                        <div class="spinner-buttons">
+                            <button type="button" class="spinner-button" onclick="incrementValue('balconies')">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button type="button" class="spinner-button" onclick="decrementValue('balconies')">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="furnishing" class="form-label">
+                        <i class="fas fa-couch"></i> Furnishing
+                    </label>
+                    <select id="furnishing" name="furnishing" class="form-control form-control-select">
+                        <option value="Unfurnished">Unfurnished</option>
+                        <option value="Semi-Furnished">Semi-Furnished</option>
+                        <option value="Fully-Furnished">Fully-Furnished</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group sale-field">
+                <label for="total_units" class="form-label">
+                    <i class="fas fa-boxes"></i> Total Units *
+                </label>
+                <div class="form-spinner">
+                    <input type="number" id="total_units" name="total_units" class="form-control" min="1" step="1" value="100">
+                    <div class="spinner-buttons">
+                        <button type="button" class="spinner-button" onclick="incrementValue('total_units')">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button type="button" class="spinner-button" onclick="decrementValue('total_units')">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="helper-text">Number of fractional units the property will be divided into</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-images"></i> Property Images *
+                </label>
+                <p class="helper-text">Upload up to 5 images (first image will be used as the primary image)</p>
+                <div class="image-upload-container">
+                    <div class="image-upload-box">
+                        <input type="file" id="image1" name="image1" accept="image/*" required>
+                        <div class="icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="label">Primary Image*</div>
+                        <div class="image-remove" onclick="removeImage(this)">×</div>
+                    </div>
+                    <div class="image-upload-box">
+                        <input type="file" id="image2" name="image2" accept="image/*">
+                        <div class="icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="label">Image 2</div>
+                        <div class="image-remove" onclick="removeImage(this)">×</div>
+                    </div>
+                    <div class="image-upload-box">
+                        <input type="file" id="image3" name="image3" accept="image/*">
+                        <div class="icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="label">Image 3</div>
+                        <div class="image-remove" onclick="removeImage(this)">×</div>
+                    </div>
+                    <div class="image-upload-box">
+                        <input type="file" id="image4" name="image4" accept="image/*">
+                        <div class="icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="label">Image 4</div>
+                        <div class="image-remove" onclick="removeImage(this)">×</div>
+                    </div>
+                    <div class="image-upload-box">
+                        <input type="file" id="image5" name="image5" accept="image/*">
+                        <div class="icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="label">Image 5</div>
+                        <div class="image-remove" onclick="removeImage(this)">×</div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-mint">
+                <i class="fas fa-magic"></i> Mint Property NFT
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    function incrementValue(id, step = 1) {
+        const input = document.getElementById(id);
+        input.value = (parseFloat(input.value) || 0) + step;
+        input.dispatchEvent(new Event('change'));
+    }
+    
+    function decrementValue(id, step = 1) {
+        const input = document.getElementById(id);
+        const newValue = (parseFloat(input.value) || 0) - step;
+        input.value = newValue >= 0 ? newValue : 0;
+        input.dispatchEvent(new Event('change'));
+    }
+    
+    function previewImage(input) {
+        const parent = input.parentElement;
+        const existingPreview = parent.querySelector('.image-preview');
+        
+        if (existingPreview) {
+            parent.removeChild(existingPreview);
+        }
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const preview = document.createElement('img');
+                preview.classList.add('image-preview');
+                preview.src = e.target.result;
+                parent.appendChild(preview);
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function removeImage(button) {
+        const parent = button.parentElement;
+        const input = parent.querySelector('input[type="file"]');
+        const preview = parent.querySelector('.image-preview');
+        
+        if (preview) {
+            parent.removeChild(preview);
+        }
+        
+        input.value = '';
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('mintPropertyForm');
+        const listingTypeSelect = document.getElementById('listing_type');
+        const saleFields = document.querySelectorAll('.sale-field');
+        const rentFields = document.querySelectorAll('.rent-field');
+        
+        // Handle file input changes
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                previewImage(this);
+            });
+        });
+        
+        // Handle listing type changes
+        listingTypeSelect.addEventListener('change', function() {
+            if (this.value === 'sale') {
+                saleFields.forEach(field => field.style.display = 'block');
+                rentFields.forEach(field => field.style.display = 'none');
+                document.getElementById('sale_price').setAttribute('required', '');
+                document.getElementById('rent').removeAttribute('required');
+            } else {
+                saleFields.forEach(field => field.style.display = 'none');
+                rentFields.forEach(field => field.style.display = 'block');
+                document.getElementById('rent').setAttribute('required', '');
+                document.getElementById('sale_price').removeAttribute('required');
+            }
+        });
+        
+        // Check if wallet is connected
+        form.addEventListener('submit', function(e) {
+            const wallet = localStorage.getItem('walletConnected');
+            if (!wallet) {
+                e.preventDefault();
+                alert('Please connect your wallet first');
+                return;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,654 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}EquiTerra - Blockchain Real Estate Investments{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), 
+                    url('{% static "images/hero-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        padding: 6rem 5% 8rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-content {
+        flex: 1;
+        max-width: 650px;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .hero-description {
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+        max-width: 550px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-button {
+        padding: 1rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .primary-action {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .primary-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .secondary-action {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: var(--text-light);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .secondary-action:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+    }
+
+    .hero-features {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-feature {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--text-light);
+    }
+
+    .hero-feature i {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+
+    .featured-property {
+        flex: 1;
+        max-width: 500px;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: transform 0.3s ease;
+    }
+
+    .featured-property:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .property-image-container {
+        height: 280px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .property-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .featured-property:hover .property-image {
+        transform: scale(1.05);
+    }
+
+    .property-badge {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+    .property-details {
+        padding: 1.75rem;
+    }
+
+    .property-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .property-location {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .property-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .meta-icon {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+
+    .meta-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .property-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 1.5rem 0;
+        color: var(--primary-color);
+    }
+
+    .property-action {
+        display: block;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: var(--border-radius);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .property-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .empty-property {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 3rem;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
+    }
+
+    /* How It Works Section */
+    .how-it-works {
+        padding: 6rem 5%;
+        background-color: var(--darker-bg);
+        position: relative;
+    }
+
+    .section-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title {
+        font-size: 2.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .section-description {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+        margin-top: 3rem;
+    }
+
+    .step-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--box-shadow);
+    }
+
+    .step-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.05));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: var(--primary-color);
+    }
+
+    .step-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .step-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .cta-section {
+        padding: 6rem 5%;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.05));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .cta-description {
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1024px) {
+        .hero-container {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-features {
+            justify-content: center;
+        }
+        
+        .featured-property {
+            max-width: 100%;
+        }
+        
+        .section-title, .cta-title {
+            font-size: 2.25rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .hero-button {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .section-title, .cta-title {
+            font-size: 2rem;
+        }
+        
+        .section-description, .cta-description {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">Tokenized Real Estate Investments</h1>
+            <p class="hero-description">
+                Revolutionize your property investments with blockchain technology. Buy, sell, and rent fractional ownership in premium real estate assets with unprecedented transparency and liquidity.
+            </p>
+            
+            <div class="hero-actions">
+                <a href="{% url 'marketplace' %}" class="hero-button primary-action">
+                    <i class="fas fa-store"></i> Explore Marketplace
+                </a>
+                <a href="{% url 'register' %}" class="hero-button secondary-action">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+            </div>
+            
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Blockchain Transactions</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-chart-line"></i>
+                    <span>AI-Powered Analytics</span>
+                </div>
+                <div class="hero-feature">
+                    <i class="fas fa-coins"></i>
+                    <span>Fractional Ownership</span>
+                </div>
+            </div>
+        </div>
+        
+        {% if property %}
+        <div class="featured-property">
+            <div class="property-image-container">
+                {% if property.image1 %}
+                    <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                {% else %}
+                    <div class="empty-property">
+                        <i class="fas fa-home empty-icon"></i>
+                        <p>Property Image</p>
+                    </div>
+                {% endif %}
+                <span class="property-badge">
+                    {% if property_type == 'sale' %}
+                        For Sale
+                    {% else %}
+                        For Rent
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="property-details">
+                <h3 class="property-title">{{ property.house_type }}</h3>
+                <p class="property-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ property.locality }}, {{ property.city }}
+                </p>
+                
+                <div class="property-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-bed meta-icon"></i>
+                        <span class="meta-label">{{ property.beds }} Beds</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-bath meta-icon"></i>
+                        <span class="meta-label">{{ property.bathrooms }} Baths</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-ruler-combined meta-icon"></i>
+                        <span class="meta-label">{{ property.area }} sqft</span>
+                    </div>
+                </div>
+                
+                <p class="property-price">
+                    {% if property_type == 'sale' %}
+                        {{ property.unit_price|floatformat:4 }} ETH/unit
+                    {% else %}
+                        {{ property.rent }} ETH/month
+                    {% endif %}
+                </p>
+                
+                <a href="{% url 'property_detail' property.id property_type %}" class="property-action">
+                    View Property Details
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="featured-property">
+            <div class="property-image-container">
+                <div class="empty-property">
+                    <i class="fas fa-search-dollar empty-icon"></i>
+                    <h3>Featured Property</h3>
+                    <p>No properties currently available</p>
+                </div>
+            </div>
+            
+            <div class="property-details">
+                <h3 class="property-title">Premium Property Coming Soon</h3>
+                <p class="property-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Prime Locations Worldwide
+                </p>
+                
+                <div class="property-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-bed meta-icon"></i>
+                        <span class="meta-label">- Beds</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-bath meta-icon"></i>
+                        <span class="meta-label">- Baths</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-ruler-combined meta-icon"></i>
+                        <span class="meta-label">- sqft</span>
+                    </div>
+                </div>
+                
+                <p class="property-price">- ETH</p>
+                
+                <a href="{% url 'marketplace' %}" class="property-action">
+                    Browse Marketplace
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="how-it-works">
+    <div class="section-container">
+        <div class="section-header">
+            <h2 class="section-title">How EquiTerra Works</h2>
+            <p class="section-description">
+                Our platform makes real estate investment accessible, transparent, and efficient through blockchain technology
+            </p>
+        </div>
+        
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="step-title">Connect Your Wallet</h3>
+                <p class="step-description">
+                    Securely connect your cryptocurrency wallet to access the platform and complete identity verification.
+                </p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="fas fa-search-dollar"></i>
+                </div>
+                <h3 class="step-title">Browse Properties</h3>
+                <p class="step-description">
+                    Explore our curated selection of tokenized real estate assets with detailed analytics and projections.
+                </p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="step-title">Invest or Rent</h3>
+                <p class="step-description">
+                    Purchase fractional ownership tokens or rent properties directly through smart contracts.
+                </p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3 class="step-title">Manage Portfolio</h3>
+                <p class="step-description">
+                    Track your investments, rental income, and property values in your personalized dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-container">
+        <h2 class="cta-title">Ready to Revolutionize Your Real Estate Investments?</h2>
+        <p class="cta-description">
+            Join thousands of investors who are already benefiting from blockchain-powered real estate transactions.
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'register' %}" class="hero-button primary-action">
+                <i class="fas fa-user-plus"></i> Create Account
+            </a>
+            <a href="{% url 'marketplace' %}" class="hero-button secondary-action">
+                <i class="fas fa-store"></i> Browse Properties
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Initialize animations
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.step-card, .featured-property');
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // Set initial state for animations
+        document.querySelectorAll('.step-card, .featured-property').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.6s ease';
+        });
+
+        // Run once on load
+        animateOnScroll();
+        
+        // Then on scroll
+        window.addEventListener('scroll', animateOnScroll);
+    });
+</script>
+{% endblock %}

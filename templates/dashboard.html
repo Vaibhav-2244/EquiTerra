@@ -1,0 +1,758 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | EquiTerra{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 5%;
+    }
+
+    .dashboard-header {
+        margin-bottom: 3rem;
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .dashboard-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 700px;
+        line-height: 1.6;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        box-shadow: var(--box-shadow);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .stat-value.eth {
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .status-badge.verified {
+        background-color: rgba(16, 185, 129, 0.15);
+        color: var(--success-color);
+    }
+
+    .status-badge.pending {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: var(--warning-color);
+    }
+
+    .status-badge.unverified {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: var(--error-color);
+    }
+
+    .dashboard-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-tab {
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.03);
+        color: var(--text-secondary);
+    }
+
+    .dashboard-tab:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+    }
+
+    .dashboard-tab.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: var(--text-light);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .properties-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+
+    .property-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: var(--box-shadow);
+    }
+
+    .property-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .property-image-container {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .property-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .property-card:hover .property-image {
+        transform: scale(1.05);
+    }
+
+    .property-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 1;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge-sale {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .badge-rent {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        color: white;
+    }
+
+    .badge-owned {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+        color: white;
+    }
+
+    .badge-purchased {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: white;
+    }
+
+    .property-details {
+        padding: 1.5rem;
+    }
+
+    .property-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .property-location {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .property-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .property-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .meta-icon {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+    }
+
+    .meta-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .property-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .property-date {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .property-action {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: var(--border-radius);
+        font-size: 0.85rem;
+        color: var(--text-light);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .property-action:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background-color: rgba(255, 255, 255, 0.03);
+        border-radius: var(--border-radius);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-message {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: grid;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .dashboard-tabs {
+            gap: 0.75rem;
+        }
+        
+        .dashboard-tab {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .properties-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Your Dashboard</h1>
+        <p class="dashboard-subtitle">
+            Manage your real estate portfolio, track investments, and view transaction history
+        </p>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <p class="stat-label">
+                <i class="fas fa-id-card"></i> KYC Status
+            </p>
+            <div class="stat-value">{{ kyc_status|title }}</div>
+            <div class="status-badge {% if kyc_status == 'verified' %}verified{% elif kyc_status == 'pending' %}pending{% else %}unverified{% endif %}">
+                {% if kyc_status == 'verified' %}
+                    <i class="fas fa-check-circle"></i> Verified
+                {% elif kyc_status == 'pending' %}
+                    <i class="fas fa-clock"></i> Pending
+                {% else %}
+                    <i class="fas fa-exclamation-circle"></i> Not Verified
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <p class="stat-label">
+                <i class="fas fa-home"></i> Properties Owned
+            </p>
+            <div class="stat-value">{{ total_properties_owned }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <p class="stat-label">
+                <i class="fas fa-wallet"></i> Rental Income
+            </p>
+            <div class="stat-value eth">{{ rental_income|floatformat:2 }} ETH</div>
+        </div>
+        
+        <div class="stat-card">
+            <p class="stat-label">
+                <i class="fas fa-chart-line"></i> Sales Income
+            </p>
+            <div class="stat-value eth">{{ sales_income|floatformat:2 }} ETH</div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-tabs">
+        <div class="dashboard-tab active" onclick="showTab('owned')">
+            <i class="fas fa-house-user"></i> Owned
+        </div>
+        <div class="dashboard-tab" onclick="showTab('purchased')">
+            <i class="fas fa-shopping-bag"></i> Purchased
+        </div>
+        <div class="dashboard-tab" onclick="showTab('rented')">
+            <i class="fas fa-key"></i> Rented
+        </div>
+        <div class="dashboard-tab" onclick="showTab('listed')">
+            <i class="fas fa-tag"></i> Listed
+        </div>
+    </div>
+
+    <!-- Owned Properties -->
+    <div id="owned" class="tab-content active">
+        <div class="properties-grid">
+            {% for property in owned_sale %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if property.image1 %}
+                        <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-sale">For Sale</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.locality }}, {{ property.city }}
+                    </p>
+                    <p class="property-price">{{ property.sale_price }} ETH</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-bed meta-icon"></i>
+                            <span class="meta-label">{{ property.beds }} Beds</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-bath meta-icon"></i>
+                            <span class="meta-label">{{ property.bathrooms }} Baths</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-ruler-combined meta-icon"></i>
+                            <span class="meta-label">{{ property.area }} sqft</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-calendar-alt"></i> Listed {{ property.list_date|date:"M d, Y" }}
+                        </span>
+                        <a href="{% url 'property_detail' property.id 'sale' %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% for property in owned_rent %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if property.image1 %}
+                        <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-rent">For Rent</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.locality }}, {{ property.city }}
+                    </p>
+                    <p class="property-price">{{ property.rent }} ETH/month</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-bed meta-icon"></i>
+                            <span class="meta-label">{{ property.beds }} Beds</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-bath meta-icon"></i>
+                            <span class="meta-label">{{ property.bathrooms }} Baths</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-ruler-combined meta-icon"></i>
+                            <span class="meta-label">{{ property.area }} sqft</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-calendar-alt"></i> Listed {{ property.list_date|date:"M d, Y" }}
+                        </span>
+                        <a href="{% url 'property_detail' property.id 'rent' %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not owned_sale and not owned_rent %}
+            <div class="empty-state">
+                <i class="fas fa-home empty-icon"></i>
+                <h3>No Owned Properties</h3>
+                <p class="empty-message">
+                    You don't currently own any properties. List a property to get started.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Purchased Properties -->
+    <div id="purchased" class="tab-content">
+        <div class="properties-grid">
+            {% for transaction in purchased_transactions %}
+            {% if transaction.property_sale %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if transaction.property_sale.image1 %}
+                        <img src="{{ transaction.property_sale.image1.url }}" alt="{{ transaction.property_sale.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-purchased">Purchased</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ transaction.property_sale.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ transaction.property_sale.locality }}, {{ transaction.property_sale.city }}
+                    </p>
+                    <p class="property-price">{{ transaction.amount }} ETH</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-boxes meta-icon"></i>
+                            <span class="meta-label">{{ transaction.units }} Units</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-percentage meta-icon"></i>
+                            <span class="meta-label">{{ transaction.units_share }}% Share</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-coins meta-icon"></i>
+                            <span class="meta-label">{{ transaction.property_sale.unit_price|floatformat:4 }} ETH/unit</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-calendar-alt"></i> {{ transaction.date|date:"M d, Y" }}
+                        </span>
+                        <a href="{% url 'property_detail' transaction.property_sale.id 'sale' %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-search-dollar empty-icon"></i>
+                <h3>No Purchased Properties</h3>
+                <p class="empty-message">
+                    You haven't purchased any properties yet. Browse the marketplace to find investment opportunities.
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Rented Properties -->
+    <div id="rented" class="tab-content">
+        <div class="properties-grid">
+            {% for agreement in rented %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if agreement.property.image1 %}
+                        <img src="{{ agreement.property.image1.url }}" alt="{{ agreement.property.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-rent">Rented</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ agreement.property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ agreement.property.locality }}, {{ agreement.property.city }}
+                    </p>
+                    <p class="property-price">{{ agreement.monthly_rent }} ETH/month</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-day meta-icon"></i>
+                            <span class="meta-label">Start: {{ agreement.start_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-check meta-icon"></i>
+                            <span class="meta-label">End: {{ agreement.end_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock meta-icon"></i>
+                            <span class="meta-label">
+                                {% if agreement.is_active %}
+                                    Active
+                                {% else %}
+                                    Expired
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-file-contract"></i> Agreement #{{ agreement.id }}
+                        </span>
+                        <a href="{% url 'rental_agreement_detail' agreement.id %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-key empty-icon"></i>
+                <h3>No Rented Properties</h3>
+                <p class="empty-message">
+                    You don't currently have any rental agreements. Browse properties for rent to get started.
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Listed Properties -->
+    <div id="listed" class="tab-content">
+        <div class="properties-grid">
+            {% for property in listed_sale %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if property.image1 %}
+                        <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-sale">{{ property.units_available }} Units Available</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.locality }}, {{ property.city }}
+                    </p>
+                    <p class="property-price">{{ property.unit_price|floatformat:4 }} ETH/unit</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-boxes meta-icon"></i>
+                            <span class="meta-label">{{ property.units_available }} Available</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-tags meta-icon"></i>
+                            <span class="meta-label">{{ property.unit_price|floatformat:4 }} ETH/unit</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-percentage meta-icon"></i>
+                            <span class="meta-label">{{ property.units_percentage|floatformat:2 }}% per unit</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-calendar-alt"></i> Listed {{ property.list_date|date:"M d, Y" }}
+                        </span>
+                        <a href="{% url 'property_detail' property.id 'sale' %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% for property in listed_rent %}
+            <div class="property-card">
+                <div class="property-image-container">
+                    {% if property.image1 %}
+                        <img src="{{ property.image1.url }}" alt="{{ property.house_type }}" class="property-image">
+                    {% else %}
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: var(--section-bg);">
+                            <i class="fas fa-home" style="font-size: 3rem; color: var(--text-secondary);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="property-badge badge-rent">For Rent</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">{{ property.house_type }}</h3>
+                    <p class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ property.locality }}, {{ property.city }}
+                    </p>
+                    <p class="property-price">{{ property.rent }} ETH/month</p>
+                    
+                    <div class="property-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-bed meta-icon"></i>
+                            <span class="meta-label">{{ property.beds }} Beds</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-bath meta-icon"></i>
+                            <span class="meta-label">{{ property.bathrooms }} Baths</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-ruler-combined meta-icon"></i>
+                            <span class="meta-label">{{ property.area }} sqft</span>
+                        </div>
+                    </div>
+                    
+                    <div class="property-footer">
+                        <span class="property-date">
+                            <i class="fas fa-calendar-alt"></i> Listed {{ property.list_date|date:"M d, Y" }}
+                        </span>
+                        <a href="{% url 'property_detail' property.id 'rent' %}" class="property-action">
+                            View <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not listed_sale and not listed_rent %}
+            <div class="empty-state">
+                <i class="fas fa-tag empty-icon"></i>
+                <h3>No Listed Properties</h3>
+                <p class="empty-message">
+                    You haven't listed any properties yet. List a property to start earning rental income or selling shares.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.dashboard-tab').forEach(button => {
+        button.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+</script>
+{% endblock %}
